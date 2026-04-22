@@ -1,0 +1,145 @@
+# AI Chat Platform (LangChain V2)
+
+Hệ thống Chatbot AI đa năng được xây dựng với Next.js (Frontend), Node.js/Express (Backend), Prisma (ORM) và LangChain.
+
+## 🚀 Tính năng chính
+- 💬 Chat với AI (GPT-4, GPT-3.5, etc.) qua giao diện hiện đại.
+- 🤖 Tạo và tùy chỉnh bot riêng với System Prompt.
+- 📂 Hỗ trợ RAG (Retrieval-Augmented Generation) - Chat với tài liệu.
+- 🔐 Đăng nhập qua Google OAuth.
+- 📱 Giao diện Responsive (tương thích mobile/desktop).
+
+---
+
+## 🛠️ Cấu trúc dự án
+- `/frontend`: Next.js application.
+- `/backend`: Node.js Express server.
+
+---
+
+## 💻 Hướng dẫn chạy Local
+
+### 1. Yêu cầu hệ thống
+- Node.js (v18 trở lên)
+- npm hoặc yarn
+
+### 2. Cài đặt Backend
+```bash
+cd backend
+npm install
+# Tạo file .env và điền các thông số cần thiết (DATABASE_URL, OPENAI_API_KEY, etc.)
+npx prisma generate
+npx prisma db push
+npm run dev
+```
+
+### 3. Cài đặt Frontend
+```bash
+cd ../frontend
+npm install
+# Tạo file .env.local và cấu hình NEXT_PUBLIC_API_URL=http://localhost:3001
+npm run dev
+```
+Truy cập: `http://localhost:3000`
+
+---
+
+## 📤 Hướng dẫn đẩy lên Git
+
+Để đẩy toàn bộ dự án lên GitHub/GitLab:
+
+1. **Khởi tạo Git:**
+   ```bash
+   git init
+   ```
+2. **Thêm các file vào commit:**
+   ```bash
+   git add .
+   ```
+3. **Commit lần đầu:**
+   ```bash
+   git commit -m "Initial commit: AI Chat Platform with RAG"
+   ```
+4. **Tạo Repo trên GitHub và kết nối:**
+   ```bash
+   git branch -M main
+   git remote add origin <URL_REPO_CUA_BAN>
+   git push -u origin main
+   ```
+
+---
+
+## 🌐 Hướng dẫn Deploy lên VPS (Ubuntu/Linux)
+
+### 1. Chuẩn bị VPS
+- Cài đặt Node.js: `curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt-get install -y nodejs`
+- Cài đặt PM2: `sudo npm install -g pm2`
+- Cài đặt Nginx: `sudo apt install nginx`
+
+### 2. Clone dự án và Cài đặt
+```bash
+git clone <URL_REPO>
+cd langchain2
+
+# Cài đặt Backend
+cd backend
+npm install --production
+# Tạo file .env (Sử dụng MySQL nếu cần hiệu năng cao hơn SQLite)
+npx prisma generate
+npx prisma db push
+pm2 start src/app.ts --name "ai-backend" --interpreter ts-node # Hoặc build sang JS rồi chạy
+# Lưu ý: Nên build sang JS để đạt hiệu năng tốt nhất trên VPS
+
+# Cài đặt Frontend
+cd ../frontend
+npm install
+# Tạo file .env.local với các biến môi trường production
+npm run build
+pm2 start npm --name "ai-frontend" -- start
+```
+
+### 3. Lưu cấu hình PM2
+```bash
+pm2 save
+pm2 startup
+```
+
+### 4. Cấu hình Nginx (Reverse Proxy)
+Tạo file cấu hình: `sudo nano /etc/nginx/sites-available/aichat`
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    location /api {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+Kích hoạt:
+```bash
+sudo ln -s /etc/nginx/sites-available/aichat /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+---
+
+## ⚠️ Lưu ý bảo mật
+- KHÔNG commit các file `.env` chứa thông tin nhạy cảm.
+- Thay đổi `JWT_SECRET` và các API keys trước khi deploy.
+- Sử dụng HTTPS (Certbot) cho production: `sudo apt install certbot python3-certbot-nginx && sudo certbot --nginx`

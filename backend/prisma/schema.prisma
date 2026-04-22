@@ -1,0 +1,82 @@
+// Prisma Schema for Langchain Chatbot WebUI
+// Using SQLite for development, can be switched to MySQL for production
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(uuid())
+  email        String         @unique
+  passwordHash String?        @map("password_hash")
+  name         String
+  googleId     String?        @unique @map("google_id")
+  avatar       String?
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  chatbots     Chatbot[]
+  conversations Conversation[]
+
+  @@map("users")
+}
+
+model Chatbot {
+  id             String         @id @default(uuid())
+  userId         String         @map("user_id")
+  name           String
+  description    String?
+  systemPrompt   String         @default("You are a helpful assistant.") @map("system_prompt")
+  starterPrompts String?        @map("starter_prompts")
+  model          String         @default("gpt-3.5-turbo")
+  avatar         String?
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  datasets       Dataset[]
+  conversations  Conversation[]
+
+  @@map("chatbots")
+}
+
+model Dataset {
+  id           String   @id @default(uuid())
+  chatbotId    String   @map("chatbot_id")
+  fileName     String   @map("file_name")
+  filePath     String   @map("file_path")
+  fileSize     Int      @default(0) @map("file_size")
+  vectorStatus String   @default("pending") @map("vector_status") // pending, processing, completed, failed
+  createdAt    DateTime @default(now()) @map("created_at")
+  chatbot      Chatbot  @relation(fields: [chatbotId], references: [id], onDelete: Cascade)
+
+  @@map("datasets")
+}
+
+model Conversation {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  chatbotId String?   @map("chatbot_id")
+  title     String    @default("New Conversation")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatbot   Chatbot?  @relation(fields: [chatbotId], references: [id], onDelete: SetNull)
+  messages  Message[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String       @map("conversation_id")
+  role           String       // "user" | "assistant" | "system"
+  content        String
+  createdAt      DateTime     @default(now()) @map("created_at")
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}

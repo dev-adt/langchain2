@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Environment variables (SENSITIVE)
+.env
+.env.*
+!.env.example
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Database
+/backend/prisma/dev.db
+/backend/prisma/dev.db-journal
+*.db
+*.db-journal
+
+# Uploads and temporary files
+/backend/uploads/*
+!/backend/uploads/.gitkeep
+.DS_Store
+Thumbs.db
+/AI_Plan
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
