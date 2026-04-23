@@ -54,16 +54,7 @@ export default function Sidebar() {
   };
 
   const handleSelectBot = (bot: Chatbot) => {
-    let prompts = null;
-    if (bot.starterPrompts) {
-      try {
-        prompts = JSON.parse(bot.starterPrompts);
-      } catch (e) {
-        console.error('Failed to parse starter prompts', e);
-      }
-    }
-    switchChatbot(bot.id, bot.name, prompts);
-    router.push('/');
+    router.push(`/b/${bot.id}`);
     if (window.innerWidth < 1024) close();
   };
 
