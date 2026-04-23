@@ -22,7 +22,7 @@ npm run build
 
 # Delete existing PM2 process if exists and start new production one
 pm2 delete ai-backend 2>/dev/null || true
-pm2 start dist/index.js --name "ai-backend"
+pm2 start dist/app.js --name "ai-backend"
 cd ..
 
 # 3. Update Frontend
