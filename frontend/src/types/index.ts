@@ -52,6 +52,7 @@ export interface Chatbot {
   starterPrompts?: string; // JSON string
   model: string;
   avatar?: string | null;
+  isPublic: boolean;
   createdAt: string;
   updatedAt: string;
   datasets?: Dataset[];
@@ -71,11 +72,13 @@ export interface Dataset {
 }
 
 export interface CreateChatbotPayload {
+  id?: string;
   name: string;
   description?: string;
   systemPrompt: string;
   starterPrompts?: { title: string; description: string; prompt: string }[];
   model: string;
+  isPublic?: boolean;
 }
 
 // ============ SSE Types ============

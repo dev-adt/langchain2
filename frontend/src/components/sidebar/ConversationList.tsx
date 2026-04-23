@@ -65,13 +65,18 @@ export default function ConversationList() {
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     e.preventDefault();
-    console.log('Attempting to delete conversation:', id);
+    
     if (confirm('Bạn có chắc chắn muốn xóa cuộc trò chuyện này?')) {
+      const isCurrent = activeConversationId === id || pathname === `/c/${id}`;
+      
       try {
-        await deleteConversation(id);
-        if (activeConversationId === id || pathname === `/c/${id}`) {
+        // If it's the current conversation, navigate to home FIRST
+        // to prevent the Page component from re-fetching after the store update
+        if (isCurrent) {
           router.push('/');
         }
+        
+        await deleteConversation(id);
       } catch (err) {
         console.error('Delete failed:', err);
         alert('Không thể xóa cuộc trò chuyện. Vui lòng thử lại.');

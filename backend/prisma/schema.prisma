@@ -34,6 +34,7 @@ model Chatbot {
   starterPrompts String?        @map("starter_prompts")
   model          String         @default("gpt-3.5-turbo")
   avatar         String?
+  isPublic       Boolean        @default(false) @map("is_public")
   createdAt      DateTime       @default(now()) @map("created_at")
   updatedAt      DateTime       @updatedAt @map("updated_at")
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)

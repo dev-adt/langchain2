@@ -66,9 +66,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
         messages: conversation.messages || [],
         isLoadingMessages: false,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load messages:', error);
       set({ isLoadingMessages: false });
+      
+      // If conversation not found (404), clear active state and redirect to home
+      if (error.response?.status === 404) {
+        set({ activeConversationId: null, messages: [] });
+        if (typeof window !== 'undefined') {
+          window.location.href = '/';
+        }
+      }
     }
   },
 

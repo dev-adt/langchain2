@@ -84,11 +84,13 @@ cd langchain2
 # Cài đặt Backend
 cd backend
 npm install --production
-# Tạo file .env (Sử dụng MySQL nếu cần hiệu năng cao hơn SQLite)
-npx prisma generate
-npx prisma db push
-pm2 start src/app.ts --name "ai-backend" --interpreter ts-node # Hoặc build sang JS rồi chạy
-# Lưu ý: Nên build sang JS để đạt hiệu năng tốt nhất trên VPS
+# Tạo file .env
+# Hệ thống sẽ tự động nhận diện DATABASE_URL:
+# - Nếu là 'mysql://...' -> Dùng MySQL
+# - Nếu là 'file:...' -> Dùng SQLite
+npm run prisma:generate
+npm run prisma:push
+pm2 start src/app.ts --name "ai-backend" --interpreter ts-node
 
 # Cài đặt Frontend
 cd ../frontend
@@ -137,9 +139,22 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
+## ⚙️ Cấu hình Environment (.env)
+
+Dự án sử dụng các file `.env.example` làm mẫu. Khi triển khai lên VPS hoặc máy mới:
+
+1. **Backend**:
+   - Copy `backend/.env.example` thành `backend/.env`.
+   - Cập nhật các giá trị: `DATABASE_URL`, `OPENAI_API_KEY`, `JWT_SECRET`, và các thông tin Google OAuth (nếu dùng).
+   - Đảm bảo `FRONTEND_URL` trỏ về domain của frontend.
+
+2. **Frontend**:
+   - Copy `frontend/.env.example` thành `frontend/.env.local`.
+   - Cập nhật `NEXT_PUBLIC_API_URL` trỏ về domain của backend (ví dụ: `https://api.yourdomain.com/api`).
+
 ---
 
 ## ⚠️ Lưu ý bảo mật
-- KHÔNG commit các file `.env` chứa thông tin nhạy cảm.
-- Thay đổi `JWT_SECRET` và các API keys trước khi deploy.
-- Sử dụng HTTPS (Certbot) cho production: `sudo apt install certbot python3-certbot-nginx && sudo certbot --nginx`
+- KHÔNG commit các file `.env` chứa thông tin thực tế lên Git.
+- Thay đổi các khóa bí mật (`JWT_SECRET`) trước khi deploy bản sản phẩm.
+- Sử dụng HTTPS cho môi trường production để bảo vệ dữ liệu người dùng.

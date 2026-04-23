@@ -40,7 +40,13 @@ export const getChatbot = async (req: Request, res: Response): Promise<void> => 
     const id = req.params.id as string;
 
     const chatbot = await prisma.chatbot.findFirst({
-      where: { id, userId: req.user.id },
+      where: {
+        id,
+        OR: [
+          { userId: req.user.id },
+          { isPublic: true }
+        ]
+      },
       include: {
         datasets: true,
         _count: {
@@ -69,7 +75,7 @@ export const createChatbot = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    const { name, description, systemPrompt, starterPrompts, model } = req.body;
+    const { name, description, systemPrompt, starterPrompts, model, isPublic } = req.body;
 
     if (!name) {
       res.status(400).json({ error: 'Name is required' });
@@ -84,6 +90,7 @@ export const createChatbot = async (req: Request, res: Response): Promise<void> 
         systemPrompt: systemPrompt || 'You are a helpful assistant.',
         starterPrompts: starterPrompts ? JSON.stringify(starterPrompts) : null,
         model: model || 'gpt-3.5-turbo',
+        isPublic: isPublic === true,
       },
     });
 
@@ -103,7 +110,7 @@ export const updateChatbot = async (req: Request, res: Response): Promise<void> 
     }
 
     const id = req.params.id as string;
-    const { name, description, systemPrompt, starterPrompts, model } = req.body;
+    const { name, description, systemPrompt, starterPrompts, model, isPublic } = req.body;
 
     const chatbot = await prisma.chatbot.findFirst({
       where: { id, userId: req.user.id },
@@ -122,6 +129,7 @@ export const updateChatbot = async (req: Request, res: Response): Promise<void> 
         systemPrompt: systemPrompt || chatbot.systemPrompt,
         starterPrompts: starterPrompts !== undefined ? JSON.stringify(starterPrompts) : chatbot.starterPrompts,
         model: model || chatbot.model,
+        isPublic: isPublic !== undefined ? isPublic : chatbot.isPublic,
       },
     });
 

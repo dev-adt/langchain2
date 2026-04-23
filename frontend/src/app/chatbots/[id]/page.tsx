@@ -81,10 +81,12 @@ export default function EditChatbotPage() {
           </h2>
           <ChatbotForm
             initialData={{
+              id: chatbot.id,
               name: chatbot.name,
               description: chatbot.description || '',
               systemPrompt: chatbot.systemPrompt,
               model: chatbot.model,
+              isPublic: chatbot.isPublic,
               starterPrompts: chatbot.starterPrompts ? JSON.parse(chatbot.starterPrompts) : undefined,
             }}
             onSubmit={handleSubmit}

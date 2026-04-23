@@ -99,6 +99,24 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
       }
     } else {
       // Create new conversation
+      // Security check: If chatbotId is provided, ensure it's either owned by user or public
+      if (chatbotId) {
+        const targetChatbot = await prisma.chatbot.findFirst({
+          where: {
+            id: chatbotId,
+            OR: [
+              { userId: req.user.id },
+              { isPublic: true }
+            ]
+          }
+        });
+
+        if (!targetChatbot) {
+          res.status(404).json({ error: 'Chatbot not found or not accessible' });
+          return;
+        }
+      }
+
       const title = message.substring(0, 100);
       conversation = await prisma.conversation.create({
         data: {

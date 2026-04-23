@@ -40,8 +40,10 @@ export default function ChatbotForm({
       { title: '', description: '', prompt: '' }
     ]
   );
+  const [isPublic, setIsPublic] = useState(initialData?.isPublic || false);
 
   const [error, setError] = useState('');
+  const [copied, setCopied] = useState(false);
 
   // Update form when initialData changes
   React.useEffect(() => {
@@ -50,6 +52,7 @@ export default function ChatbotForm({
       setDescription(initialData.description || '');
       setSystemPrompt(initialData.systemPrompt || 'You are a helpful assistant. Respond in Vietnamese.');
       setModel(initialData.model || 'gpt-3.5-turbo');
+      setIsPublic(initialData.isPublic || false);
       if (initialData.starterPrompts) {
         setStarterPrompts(initialData.starterPrompts);
       }
@@ -72,6 +75,15 @@ export default function ChatbotForm({
     setStarterPrompts(newPrompts);
   };
 
+  const handleCopyLink = () => {
+    if (initialData?.id) {
+      const shareUrl = `${window.location.origin}/b/${initialData.id}`;
+      navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -90,6 +102,7 @@ export default function ChatbotForm({
         description: description.trim() || undefined,
         systemPrompt: systemPrompt.trim(),
         model,
+        isPublic,
         starterPrompts: validPrompts.length > 0 ? validPrompts : undefined
       });
     } catch (err: any) {
@@ -150,6 +163,53 @@ export default function ChatbotForm({
           rows={4}
           className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 focus:outline-none bg-white text-gray-900 text-sm resize-none"
         />
+      </div>
+
+      {/* Share Section */}
+      <div className="p-4 rounded-2xl bg-teal-50 border border-teal-100 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-teal-900">Chế độ công khai</h3>
+            <p className="text-xs text-teal-700 mt-0.5">
+              Cho phép người khác truy cập chatbot này qua đường link.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsPublic(!isPublic)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+              isPublic ? 'bg-teal-600' : 'bg-gray-300'
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                isPublic ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+
+        {isPublic && initialData?.id && (
+          <div className="pt-2 border-t border-teal-100">
+            <label className="block text-xs font-medium text-teal-800 mb-1.5">
+              Link chia sẻ
+            </label>
+            <div className="flex gap-2">
+              <input
+                readOnly
+                value={`${typeof window !== 'undefined' ? window.location.origin : ''}/b/${initialData.id}`}
+                className="flex-1 bg-white border border-teal-200 rounded-lg px-3 py-1.5 text-xs text-teal-900 focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="px-3 py-1.5 bg-white border border-teal-200 rounded-lg text-xs font-medium text-teal-700 hover:bg-teal-50 transition-colors"
+              >
+                {copied ? 'Đã chép!' : 'Sao chép'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Starter Prompts Section */}
