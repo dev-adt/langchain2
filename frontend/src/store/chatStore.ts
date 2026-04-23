@@ -222,6 +222,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
   clearChat: () => {
     set({
       activeConversationId: null,
+      messages: [],
+      isStreaming: false,
+      streamingContent: '',
+    });
+  },
+
+  clearAll: () => {
+    set({
+      activeConversationId: null,
       activeChatbotId: null,
       activeChatbotName: null,
       activeChatbotPrompts: null,
