@@ -83,14 +83,15 @@ cd langchain2
 
 # Cài đặt Backend
 cd backend
-npm install --production
+npm install
 # Tạo file .env
 # Hệ thống sẽ tự động nhận diện DATABASE_URL:
 # - Nếu là 'mysql://...' -> Dùng MySQL
 # - Nếu là 'file:...' -> Dùng SQLite
 npm run prisma:generate
 npm run prisma:push
-pm2 start src/app.ts --name "ai-backend" --interpreter ts-node
+npm run build
+pm2 start dist/app.js --name "ai-backend"
 
 # Cài đặt Frontend
 cd ../frontend
