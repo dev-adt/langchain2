@@ -30,7 +30,7 @@ model Chatbot {
   userId         String         @map("user_id")
   name           String
   description    String?        @map("description") // @db.Text
-  systemPrompt   String         @default("You are a helpful assistant.") @map("system_prompt") // @db.Text
+  systemPrompt   String?        @map("system_prompt") // @db.Text
   starterPrompts String?        @map("starter_prompts") // @db.Text
   model          String         @default("gpt-3.5-turbo")
   avatar         String?
