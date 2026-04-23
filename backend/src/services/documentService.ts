@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 
+import prisma from '../config/database';
+
 /**
  * Parse document content from file
  */
@@ -43,7 +45,7 @@ const splitIntoChunks = async (text: string): Promise<string[]> => {
 };
 
 /**
- * Process a document: parse -> chunk -> store vectors
+ * Process a document: parse -> chunk -> store vectors in DB
  * This is called asynchronously after file upload
  */
 export const processDocument = async (
@@ -53,72 +55,79 @@ export const processDocument = async (
 ): Promise<void> => {
   console.log(`Processing document ${datasetId} for chatbot ${chatbotId}`);
 
-  // 1. Parse file content
-  const text = await parseFile(filePath);
-  console.log(`Parsed ${text.length} characters from file`);
+  try {
+    // Update status to processing
+    await prisma.dataset.update({
+      where: { id: datasetId },
+      data: { vectorStatus: 'processing' },
+    });
 
-  // 2. Split into chunks
-  const chunks = await splitIntoChunks(text);
-  console.log(`Split into ${chunks.length} chunks`);
+    // 1. Parse file content
+    const text = await parseFile(filePath);
+    console.log(`Parsed ${text.length} characters from file`);
 
-  // 3. Store vectors (placeholder - integrate with VectorDB later)
-  // For now, we store the chunks as a JSON file alongside the original
-  const chunksPath = filePath + '.chunks.json';
-  fs.writeFileSync(
-    chunksPath,
-    JSON.stringify({
-      datasetId,
-      chatbotId,
-      chunks,
-      processedAt: new Date().toISOString(),
-    })
-  );
+    // 2. Split into chunks
+    const chunks = await splitIntoChunks(text);
+    console.log(`Split into ${chunks.length} chunks`);
 
-  console.log(`Document ${datasetId} processed successfully`);
+    // 3. Store chunks in Database
+    await prisma.documentChunk.createMany({
+      data: chunks.map((content) => ({
+        datasetId,
+        chatbotId,
+        content,
+      })),
+    });
+
+    // Update status to completed
+    await prisma.dataset.update({
+      where: { id: datasetId },
+      data: { vectorStatus: 'completed' },
+    });
+
+    console.log(`Document ${datasetId} processed successfully and saved to DB`);
+  } catch (error: any) {
+    console.error(`Error processing document ${datasetId}:`, error);
+    await prisma.dataset.update({
+      where: { id: datasetId },
+      data: { vectorStatus: 'failed' },
+    });
+  }
 };
 
 /**
- * Retrieve relevant chunks for a query (simple keyword matching fallback)
- * In production, this would use vector similarity search
+ * Retrieve relevant chunks for a query from Database
  */
 export const retrieveRelevantChunks = async (
   chatbotId: string,
   query: string,
   topK: number = 3
 ): Promise<string[]> => {
-  // Simple implementation: read all chunk files for this chatbot and do basic matching
-  const uploadsDir = path.join(__dirname, '../../uploads');
-
-  if (!fs.existsSync(uploadsDir)) {
-    return [];
-  }
-
-  const files = fs.readdirSync(uploadsDir).filter((f) => f.endsWith('.chunks.json'));
-  const allChunks: string[] = [];
-
-  for (const file of files) {
-    try {
-      const data = JSON.parse(fs.readFileSync(path.join(uploadsDir, file), 'utf-8'));
-      if (data.chatbotId === chatbotId) {
-        allChunks.push(...data.chunks);
-      }
-    } catch {
-      // Skip invalid files
-    }
-  }
+  // Get all chunks for this chatbot
+  const allChunks = await prisma.documentChunk.findMany({
+    where: { chatbotId },
+    select: { content: true },
+  });
 
   if (allChunks.length === 0) return [];
 
   // Simple relevance scoring based on keyword overlap
-  const queryWords = query.toLowerCase().split(/\s+/);
+  const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+  
   const scored = allChunks.map((chunk) => {
-    const chunkLower = chunk.toLowerCase();
+    const chunkLower = chunk.content.toLowerCase();
     const score = queryWords.reduce((acc, word) => {
       return acc + (chunkLower.includes(word) ? 1 : 0);
     }, 0);
-    return { chunk, score };
+    return { content: chunk.content, score };
   });
 
+  // Sort by score and take top K
   scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, topK).map((s) => s.chunk);
+  
+  // Return only chunks with some relevance (score > 0)
+  return scored
+    .filter(s => s.score > 0)
+    .slice(0, topK)
+    .map((s) => s.content);
 };

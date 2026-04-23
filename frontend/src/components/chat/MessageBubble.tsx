@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import Avatar from '@/components/ui/Avatar';
 import { useAuthStore } from '@/store/authStore';
 
@@ -15,7 +17,7 @@ export default function MessageBubble({ role, content, isStreaming }: MessageBub
   const isUser = role === 'user';
 
   return (
-    <div className={`flex gap-3 py-4 px-4 md:px-0 ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex gap-3 py-4 px-4 md:px-0 ${isUser ? 'justify-end user-bubble' : 'justify-start'}`}>
       {/* AI Avatar */}
       {!isUser && (
         <div className="flex-shrink-0 mt-1">
@@ -28,15 +30,16 @@ export default function MessageBubble({ role, content, isStreaming }: MessageBub
         className={`max-w-[80%] md:max-w-[70%] rounded-2xl px-4 py-3 text-sm leading-relaxed
           ${
             isUser
-              ? 'bg-teal-600 text-white rounded-br-md'
-              : 'bg-gray-100 text-gray-800 rounded-bl-md'
+              ? 'bg-teal-600 text-white rounded-br-md shadow-sm'
+              : 'bg-gray-100 text-gray-800 rounded-bl-md shadow-sm border border-gray-200/50'
           }`}
       >
-        {/* Render content with basic markdown-like formatting */}
-        <div className="whitespace-pre-wrap break-words">
-          {content}
+        <div className="markdown-content">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {content}
+          </ReactMarkdown>
           {isStreaming && (
-            <span className="inline-block w-1.5 h-4 ml-0.5 bg-current animate-pulse rounded-sm" />
+            <span className="inline-block w-1.5 h-4 ml-0.5 bg-current animate-pulse rounded-sm align-middle" />
           )}
         </div>
       </div>

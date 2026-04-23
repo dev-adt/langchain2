@@ -95,3 +95,56 @@ body {
 ::selection {
   background-color: rgba(13, 148, 136, 0.2);
 }
+
+/* Markdown Styling */
+.markdown-content {
+  @apply space-y-3;
+}
+
+.markdown-content h1 { @apply text-xl font-bold mb-2; }
+.markdown-content h2 { @apply text-lg font-bold mb-2; }
+.markdown-content h3 { @apply text-base font-bold mb-1; }
+
+.markdown-content p { @apply mb-2 last:mb-0; }
+
+.markdown-content ul { @apply list-disc list-inside mb-2 space-y-1; }
+.markdown-content ol { @apply list-decimal list-inside mb-2 space-y-1; }
+
+.markdown-content li { @apply mb-0.5; }
+
+.markdown-content strong { @apply font-bold text-current; }
+.markdown-content em { @apply italic; }
+
+.markdown-content a { @apply text-teal-600 underline hover:text-teal-700; }
+
+.markdown-content code {
+  @apply px-1.5 py-0.5 rounded bg-black/5 font-mono text-xs text-rose-500;
+}
+
+.markdown-content pre {
+  @apply p-4 rounded-xl bg-gray-900 text-gray-100 font-mono text-xs overflow-x-auto my-3;
+}
+
+.markdown-content pre code {
+  @apply p-0 bg-transparent text-gray-100;
+}
+
+.markdown-content blockquote {
+  @apply border-l-4 border-gray-300 pl-4 italic my-2 text-gray-600;
+}
+
+.markdown-content table {
+  @apply w-full border-collapse my-3 text-xs;
+}
+
+.markdown-content th, .markdown-content td {
+  @apply border border-gray-300 px-3 py-2 text-left;
+}
+
+.markdown-content th {
+  @apply bg-gray-50 font-bold;
+}
+
+/* Specific adjustments for User bubbles (white text) */
+.user-bubble .markdown-content a { @apply text-white underline; }
+.user-bubble .markdown-content code { @apply bg-white/20 text-white; }

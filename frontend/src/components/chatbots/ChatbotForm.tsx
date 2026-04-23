@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { CreateChatbotPayload } from '@/types';
-import { Plus, Trash2, HelpCircle } from 'lucide-react';
+import { Plus, Trash2, HelpCircle, Maximize2, X } from 'lucide-react';
 
 interface ChatbotFormProps {
   initialData?: Partial<CreateChatbotPayload>;
@@ -44,6 +44,7 @@ export default function ChatbotForm({
 
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [isPromptExpanded, setIsPromptExpanded] = useState(false);
 
   // Update form when initialData changes
   React.useEffect(() => {
@@ -152,10 +153,19 @@ export default function ChatbotForm({
         placeholder="Mô tả ngắn gọn về chatbot..."
       />
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">
-          System Prompt
-        </label>
+      <div className="relative">
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="block text-sm font-medium text-gray-700">
+            System Prompt
+          </label>
+          <button
+            type="button"
+            onClick={() => setIsPromptExpanded(true)}
+            className="text-teal-600 hover:text-teal-700 text-xs font-medium flex items-center gap-1 transition-colors"
+          >
+            <Maximize2 className="w-3 h-3" /> Phóng to
+          </button>
+        </div>
         <textarea
           value={systemPrompt}
           onChange={(e) => setSystemPrompt(e.target.value)}
@@ -163,6 +173,47 @@ export default function ChatbotForm({
           rows={4}
           className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 focus:outline-none bg-white text-gray-900 text-sm resize-none"
         />
+
+        {/* Full-screen Prompt Editor Modal */}
+        {isPromptExpanded && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col h-[80vh] overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white">
+                <div className="flex items-center gap-2">
+                  <Maximize2 className="w-5 h-5 text-teal-600" />
+                  <h3 className="font-bold text-gray-800 text-lg">Chỉnh sửa System Prompt</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsPromptExpanded(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="flex-1 p-6 bg-gray-50/50">
+                <textarea
+                  autoFocus
+                  value={systemPrompt}
+                  onChange={(e) => setSystemPrompt(e.target.value)}
+                  placeholder="Nhập hướng dẫn chi tiết cho chatbot..."
+                  className="w-full h-full p-6 rounded-2xl border border-gray-200 focus:border-teal-400 focus:ring-4 focus:ring-teal-100 focus:outline-none bg-white text-gray-800 text-base leading-relaxed shadow-inner"
+                />
+              </div>
+
+              <div className="px-6 py-4 border-t border-gray-100 bg-white flex justify-end">
+                <Button
+                  type="button"
+                  onClick={() => setIsPromptExpanded(false)}
+                  className="px-8"
+                >
+                  Xong
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Share Section */}

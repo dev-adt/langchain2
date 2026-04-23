@@ -53,8 +53,20 @@ model Dataset {
   vectorStatus String   @default("pending") @map("vector_status") // pending, processing, completed, failed
   createdAt    DateTime @default(now()) @map("created_at")
   chatbot      Chatbot  @relation(fields: [chatbotId], references: [id], onDelete: Cascade)
+  chunks       DocumentChunk[]
 
   @@map("datasets")
+}
+
+model DocumentChunk {
+  id        String   @id @default(uuid())
+  datasetId String   @map("dataset_id")
+  chatbotId String   @map("chatbot_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  dataset   Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+
+  @@map("document_chunks")
 }
 
 model Conversation {
