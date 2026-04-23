@@ -113,8 +113,8 @@ export default function Sidebar() {
               {showBots && (
                 <div className="space-y-0.5 mt-1">
                   {/* Default Assistant */}
-                  <button
-                    onClick={handleDefaultAssistant}
+                  <a
+                    href="/"
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-sm transition-all duration-150
                       ${!activeChatbotId
                         ? 'bg-white shadow-sm text-gray-900 font-medium'
@@ -126,13 +126,13 @@ export default function Sidebar() {
                       AI
                     </div>
                     <span className="truncate">Trợ lý mặc định</span>
-                  </button>
+                  </a>
 
                   {/* Custom Bots */}
                   {chatbots.map((bot) => (
-                    <button
+                    <a
                       key={bot.id}
-                      onClick={() => handleSelectBot(bot)}
+                      href={`/b/${bot.id}`}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-sm transition-all duration-150
                         ${activeChatbotId === bot.id
                           ? 'bg-white shadow-sm text-gray-900 font-medium'
@@ -147,7 +147,7 @@ export default function Sidebar() {
                       {activeChatbotId === bot.id && (
                         <Sparkles className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" />
                       )}
-                    </button>
+                    </a>
                   ))}
 
                   {/* Quick create */}
