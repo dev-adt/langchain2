@@ -4,8 +4,13 @@ import dotenv from 'dotenv';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
 import { config } from './config';
+import passport from 'passport';
+import { configurePassport } from './config/passport';
 
 dotenv.config();
+
+// Initialize passport
+configurePassport();
 
 const app = express();
 
@@ -16,6 +21,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
 
 // API Routes
 app.use('/api', routes);

@@ -29,9 +29,9 @@ model Chatbot {
   id             String         @id @default(uuid())
   userId         String         @map("user_id")
   name           String
-  description    String?
-  systemPrompt   String         @default("You are a helpful assistant.") @map("system_prompt")
-  starterPrompts String?        @map("starter_prompts")
+  description    String?        @map("description") // @db.Text
+  systemPrompt   String         @default("You are a helpful assistant.") @map("system_prompt") // @db.Text
+  starterPrompts String?        @map("starter_prompts") // @db.Text
   model          String         @default("gpt-3.5-turbo")
   avatar         String?
   isPublic       Boolean        @default(false) @map("is_public")
@@ -48,7 +48,7 @@ model Dataset {
   id           String   @id @default(uuid())
   chatbotId    String   @map("chatbot_id")
   fileName     String   @map("file_name")
-  filePath     String   @map("file_path")
+  filePath     String   @map("file_path") // @db.Text
   fileSize     Int      @default(0) @map("file_size")
   vectorStatus String   @default("pending") @map("vector_status") // pending, processing, completed, failed
   createdAt    DateTime @default(now()) @map("created_at")
@@ -62,7 +62,7 @@ model DocumentChunk {
   id        String   @id @default(uuid())
   datasetId String   @map("dataset_id")
   chatbotId String   @map("chatbot_id")
-  content   String
+  content   String   @map("content") // @db.Text
   createdAt DateTime @default(now()) @map("created_at")
   dataset   Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
 
@@ -87,7 +87,7 @@ model Message {
   id             String       @id @default(uuid())
   conversationId String       @map("conversation_id")
   role           String       // "user" | "assistant" | "system"
-  content        String
+  content        String       @map("content") // @db.Text
   createdAt      DateTime     @default(now()) @map("created_at")
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 

@@ -98,7 +98,8 @@ cd ../frontend
 npm install
 # Tạo file .env.local với các biến môi trường production
 npm run build
-pm2 start npm --name "ai-frontend" -- start
+# Mặc định chạy cổng 3000. Nếu cổng 3000 đã bị chiếm, đổi sang 3002 bằng lệnh:
+pm2 start npm --name "ai-frontend" -- start -- -p 3002
 ```
 
 ### 3. Lưu cấu hình PM2

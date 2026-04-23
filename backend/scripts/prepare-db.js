@@ -34,18 +34,30 @@ try {
   let schemaContent = fs.readFileSync(schemaPath, 'utf8');
 
   // Regex to find the datasource block and replace the provider
-  const newSchemaContent = schemaContent.replace(
+  let updatedContent = schemaContent.replace(
     /datasource\s+db\s+{[^}]*provider\s*=\s*"[^"]*"[^}]*}/s,
     (match) => {
       return match.replace(/provider\s*=\s*"[^"]*"/, `provider = "${provider}"`);
     }
   );
 
-  if (schemaContent !== newSchemaContent) {
-    fs.writeFileSync(schemaPath, newSchemaContent);
-    console.log('✅ Updated prisma/schema.prisma provider successfully.');
+  // Handle @db.Text markers based on provider
+  if (provider === 'mysql' || provider === 'postgresql') {
+    // Enable: Find "String // @db.Text" and change to "String @db.Text"
+    updatedContent = updatedContent.replace(/\/\/\s+(@db\.(Text|LongText|MediumText))/g, '$1');
+    console.log('🚀 Enabled @db.Text for MySQL/PostgreSQL.');
   } else {
-    console.log('ℹ️ prisma/schema.prisma provider is already correct.');
+    // Disable: Find "String @db.Text" and change to "String // @db.Text"
+    // (Only if not already commented out)
+    updatedContent = updatedContent.replace(/([^\/\n\s])\s+(@db\.(Text|LongText|MediumText))/g, '$1 // $2');
+    console.log('📦 Kept @db.Text disabled for SQLite.');
+  }
+
+  if (schemaContent !== updatedContent) {
+    fs.writeFileSync(schemaPath, updatedContent);
+    console.log('✅ Updated prisma/schema.prisma successfully.');
+  } else {
+    console.log('ℹ️ prisma/schema.prisma is already up to date.');
   }
 } catch (error) {
   console.error('❌ Failed to update prisma/schema.prisma:', error.message);

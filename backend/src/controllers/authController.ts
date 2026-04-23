@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import prisma from '../config/database';
 import { generateToken } from '../utils/jwt';
+import { config } from '../config';
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -124,51 +125,20 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
 // Google OAuth callback handler
 export const googleCallback = async (req: Request, res: Response): Promise<void> => {
   try {
-    // The user should be attached by passport
-    const googleUser = req.user as any;
+    // The user is attached by passport after successful verification
+    const user = req.user as any;
 
-    if (!googleUser) {
-      res.redirect(`${process.env.FRONTEND_URL}/login?error=google_auth_failed`);
+    if (!user) {
+      res.redirect(`${config.frontendUrl}/login?error=google_auth_failed`);
       return;
     }
 
-    // Find or create user
-    let user = await prisma.user.findUnique({
-      where: { googleId: googleUser.id },
-    });
-
-    if (!user) {
-      // Check if email already exists
-      user = await prisma.user.findUnique({
-        where: { email: googleUser.emails?.[0]?.value },
-      });
-
-      if (user) {
-        // Link Google account to existing user
-        user = await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            googleId: googleUser.id,
-            avatar: googleUser.photos?.[0]?.value,
-          },
-        });
-      } else {
-        // Create new user
-        user = await prisma.user.create({
-          data: {
-            email: googleUser.emails?.[0]?.value || '',
-            name: googleUser.displayName || 'User',
-            googleId: googleUser.id,
-            avatar: googleUser.photos?.[0]?.value,
-          },
-        });
-      }
-    }
-
     const token = generateToken(user.id);
-    res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}`);
+    
+    // Redirect to frontend callback page with token
+    res.redirect(`${config.frontendUrl}/auth/callback?token=${token}`);
   } catch (error) {
     console.error('Google callback error:', error);
-    res.redirect(`${process.env.FRONTEND_URL}/login?error=google_auth_failed`);
+    res.redirect(`${config.frontendUrl}/login?error=google_auth_failed`);
   }
 };
