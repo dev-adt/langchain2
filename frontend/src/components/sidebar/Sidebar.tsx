@@ -23,7 +23,7 @@ import ConversationList from './ConversationList';
 export default function Sidebar() {
   const { isOpen, toggle, close } = useSidebarStore();
   const { user, logout, isAuthenticated } = useAuthStore();
-  const { clearChat, activeChatbotId, setActiveChatbot } = useChatStore();
+  const { clearChat, activeChatbotId, setActiveChatbot, switchChatbot } = useChatStore();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -54,7 +54,6 @@ export default function Sidebar() {
   };
 
   const handleSelectBot = (bot: Chatbot) => {
-    clearChat();
     let prompts = null;
     if (bot.starterPrompts) {
       try {
@@ -63,14 +62,13 @@ export default function Sidebar() {
         console.error('Failed to parse starter prompts', e);
       }
     }
-    setActiveChatbot(bot.id, bot.name, prompts);
+    switchChatbot(bot.id, bot.name, prompts);
     router.push('/');
     if (window.innerWidth < 1024) close();
   };
 
   const handleDefaultAssistant = () => {
-    clearChat();
-    setActiveChatbot(null, null);
+    switchChatbot(null, null);
     router.push('/');
     if (window.innerWidth < 1024) close();
   };

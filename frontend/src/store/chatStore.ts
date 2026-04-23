@@ -23,6 +23,11 @@ interface ChatState {
     name: string | null,
     prompts?: { title: string; description: string; prompt: string }[] | null
   ) => void;
+  switchChatbot: (
+    id: string | null,
+    name: string | null,
+    prompts?: { title: string; description: string; prompt: string }[] | null
+  ) => void;
   sendMessage: (
     message: string,
     conversationId?: string,
@@ -98,7 +103,23 @@ export const useChatStore = create<ChatState>((set, get) => ({
       activeChatbotPrompts: prompts || null,
     });
   },
-
+  
+  switchChatbot: (
+    id: string | null,
+    name: string | null,
+    prompts?: { title: string; description: string; prompt: string }[] | null
+  ) => {
+    set({
+      activeConversationId: null,
+      messages: [],
+      isStreaming: false,
+      streamingContent: '',
+      activeChatbotId: id,
+      activeChatbotName: name,
+      activeChatbotPrompts: prompts || null,
+    });
+  },
+  
   sendMessage: (message: string, conversationId?: string, chatbotId?: string) => {
     // Use active chatbot if none specified
     const effectiveChatbotId = chatbotId || get().activeChatbotId || undefined;

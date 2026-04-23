@@ -75,8 +75,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user, token, isAuthenticated: true });
   },
   
-  setToken: (token: string) => {
+  setToken: async (token: string) => {
     localStorage.setItem('token', token);
-    set({ token, isAuthenticated: true });
+    set({ token, isAuthenticated: true, isLoading: true });
+    try {
+      const user = await authService.getProfile();
+      localStorage.setItem('user', JSON.stringify(user));
+      set({ user, isLoading: false });
+    } catch (error) {
+      console.error('Failed to fetch user profile after token set:', error);
+      set({ isLoading: false });
+    }
   },
 }));
