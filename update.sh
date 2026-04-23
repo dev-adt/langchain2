@@ -3,10 +3,11 @@
 echo "🚀 Starting Update Process..."
 
 # 1. Pull code from Git
-echo "📥 Pulling latest code from Git..."
+echo "📥 Stashing local changes and pulling from Git..."
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-echo "📍 Current branch: $CURRENT_BRANCH"
+git stash
 git pull origin $CURRENT_BRANCH
+git stash pop
 
 # 2. Update Backend
 echo "⚙️ Updating Backend..."
