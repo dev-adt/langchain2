@@ -54,11 +54,23 @@ export default function Sidebar() {
   };
 
   const handleSelectBot = (bot: Chatbot) => {
-    window.location.href = `/?bot=${bot.id}`;
+    let prompts = null;
+    if (bot.starterPrompts) {
+      try {
+        prompts = JSON.parse(bot.starterPrompts);
+      } catch (e) {
+        console.error('Failed to parse starter prompts', e);
+      }
+    }
+    switchChatbot(bot.id, bot.name, prompts);
+    router.push('/');
+    if (window.innerWidth < 1024) close();
   };
 
   const handleDefaultAssistant = () => {
-    window.location.href = '/';
+    switchChatbot(null, null);
+    router.push('/');
+    if (window.innerWidth < 1024) close();
   };
 
   return (

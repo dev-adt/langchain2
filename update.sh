@@ -3,7 +3,7 @@
 # Exit on error
 set -e
 
-echo "🚀 Starting Update Process..."
+echo "🚀 Starting Production Update Process..."
 
 # 1. Clean and Pull code from Git
 echo "📥 Cleaning local conflicts and pulling from Git..."
@@ -14,21 +14,28 @@ git checkout backend/prisma/schema.prisma 2>/dev/null || true
 git pull origin $CURRENT_BRANCH
 
 # 2. Update Backend
-echo "⚙️ Updating Backend..."
+echo "⚙️ Updating Backend (Production)..."
 cd backend
 npm install
 npm run prisma:push
 npm run build
-pm2 restart ai-backend
+
+# Delete existing PM2 process if exists and start new production one
+pm2 delete ai-backend 2>/dev/null || true
+pm2 start dist/index.js --name "ai-backend"
 cd ..
 
 # 3. Update Frontend
-echo "💻 Updating Frontend..."
+echo "💻 Updating Frontend (Production)..."
 cd frontend
 npm install
 npm run build
-pm2 restart ai-frontend
+
+# Delete existing PM2 process if exists and start new production one
+pm2 delete ai-frontend 2>/dev/null || true
+pm2 start npm --name "ai-frontend" -- start
 cd ..
 
-echo "✅ Update Completed Successfully!"
+echo "✅ Production Update Completed Successfully!"
+pm2 save
 pm2 status
