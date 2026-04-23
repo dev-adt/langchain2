@@ -7,7 +7,7 @@ import ChatWindow from '@/components/chat/ChatWindow';
 import { useChatStore } from '@/store/chatStore';
 
 export default function HomePage() {
-  const { messages, isStreaming } = useChatStore();
+  const { messages, isStreaming, activeChatbotId } = useChatStore();
   const hasMessages = messages.length > 0 || isStreaming;
 
   return (

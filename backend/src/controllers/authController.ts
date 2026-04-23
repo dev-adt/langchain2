@@ -136,7 +136,7 @@ export const googleCallback = async (req: Request, res: Response): Promise<void>
     const token = generateToken(user.id);
     
     // Redirect to frontend callback page with token
-    res.redirect(`${config.frontendUrl}/auth/callback?token=${token}`);
+    res.redirect(`${config.frontendUrl}/callback?token=${token}`);
   } catch (error) {
     console.error('Google callback error:', error);
     res.redirect(`${config.frontendUrl}/login?error=google_auth_failed`);

@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   title: "AI Chatbot - Trợ lý thông minh",
   description: "Nền tảng chatbot AI thông minh với khả năng tùy biến cao, hỗ trợ Custom Chatbot, RAG và nhiều tính năng mạnh mẽ.",
   keywords: "chatbot, AI, langchain, custom chatbot, RAG",
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
