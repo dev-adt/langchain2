@@ -54,7 +54,7 @@ export default function Sidebar() {
   };
 
   const handleSelectBot = (bot: Chatbot) => {
-    window.location.href = `/b/${bot.id}`;
+    window.location.href = `/?bot=${bot.id}`;
   };
 
   const handleDefaultAssistant = () => {
