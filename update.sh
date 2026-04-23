@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit on error
+set -e
+
 echo "🚀 Starting Update Process..."
 
 # 1. Clean and Pull code from Git
@@ -7,7 +10,7 @@ echo "📥 Cleaning local conflicts and pulling from Git..."
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # Force discard changes in schema.prisma as prepare-db.js will regenerate them
-git checkout backend/prisma/schema.prisma 2>/dev/null
+git checkout backend/prisma/schema.prisma 2>/dev/null || true
 git pull origin $CURRENT_BRANCH
 
 # 2. Update Backend

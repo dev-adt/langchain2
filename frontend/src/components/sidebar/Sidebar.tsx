@@ -54,14 +54,11 @@ export default function Sidebar() {
   };
 
   const handleSelectBot = (bot: Chatbot) => {
-    router.push(`/b/${bot.id}`);
-    if (window.innerWidth < 1024) close();
+    window.location.href = `/b/${bot.id}`;
   };
 
   const handleDefaultAssistant = () => {
-    switchChatbot(null, null);
-    router.push('/');
-    if (window.innerWidth < 1024) close();
+    window.location.href = '/';
   };
 
   return (

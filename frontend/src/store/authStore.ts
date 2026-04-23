@@ -13,7 +13,7 @@ interface AuthState {
   logout: () => void;
   loadFromStorage: () => void;
   setUser: (user: User, token: string) => void;
-  setToken: (token: string) => void;
+  setToken: (token: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
