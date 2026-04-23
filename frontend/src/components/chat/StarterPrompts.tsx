@@ -11,24 +11,14 @@ interface StarterPrompt {
 
 const DEFAULT_STARTER_PROMPTS: StarterPrompt[] = [
   {
-    title: 'Giới thiệu ADT Group',
-    description: 'Tóm tắt nhanh về ADT Group và các năng lực nổi bật.',
-    prompt: 'Hãy giới thiệu về ADT Group và các năng lực nổi bật của tổ chức.',
+    title: 'Giới thiệu bản thân',
+    description: 'Hãy giới thiệu về tôi và các năng lực nổi bật của tôi.',
+    prompt: 'Hãy giới thiệu về bản thân tôi và các năng lực nổi bật của tôi.',
   },
   {
-    title: 'Sản phẩm và dịch vụ',
-    description: 'Tóm tắt các giải pháp công nghệ ADT đang cung cấp.',
-    prompt: 'Liệt kê và mô tả các sản phẩm, dịch vụ công nghệ mà ADT Group đang cung cấp.',
-  },
-  {
-    title: 'Trợ lý AI cho phường xã',
-    description: 'Tư vấn gói dịch vụ trợ lý AI cho khối hành chính.',
-    prompt: 'Tư vấn chi tiết về giải pháp trợ lý AI cho phường xã và khối hành chính công.',
-  },
-  {
-    title: 'ERP cho doanh nghiệp',
-    description: 'Gợi ý cách triển khai ERP cho doanh nghiệp.',
-    prompt: 'Gợi ý quy trình và cách triển khai hệ thống ERP phù hợp cho doanh nghiệp vừa và nhỏ.',
+    title: 'Xin chào',
+    description: 'Chào hỏi tôi và giới thiệu về bạn.',
+    prompt: 'Chào hỏi tôi và giới thiệu về bạn.',
   },
 ];
 
@@ -40,7 +30,7 @@ export default function StarterPrompts() {
   // For now, we'll try to find it from the chatbot list if we had one, 
   // but since we only have the ID and name, we'll assume the parent component or a hook provides it.
   // Actually, let's use a simpler approach: if it's a custom bot, we'll show its name in the welcome text.
-  
+
   // To get the actual prompts, we should ideally have them in the store. 
   // Let's assume for now we use the default ones unless the bot is specifically configured.
   // I will update the Sidebar to pass the bot details to the store.
@@ -61,9 +51,8 @@ export default function StarterPrompts() {
   return (
     <div className="flex flex-col items-center justify-center flex-1 px-4 py-8 max-w-3xl mx-auto w-full">
       {/* AI Logo */}
-      <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg mb-6 ${
-        activeChatbotId ? 'bg-gradient-to-br from-indigo-400 to-purple-500' : 'bg-gradient-to-br from-teal-400 to-teal-600'
-      }`}>
+      <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg mb-6 ${activeChatbotId ? 'bg-gradient-to-br from-indigo-400 to-purple-500' : 'bg-gradient-to-br from-teal-400 to-teal-600'
+        }`}>
         {activeChatbotName ? activeChatbotName.substring(0, 2).toUpperCase() : 'AI'}
       </div>
 
