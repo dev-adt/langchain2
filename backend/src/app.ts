@@ -13,6 +13,7 @@ dotenv.config();
 configurePassport();
 
 const app = express();
+app.set('trust proxy', true);
 
 // Middleware
 app.use(cors({

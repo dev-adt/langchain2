@@ -17,6 +17,7 @@ export const configurePassport = () => {
         clientID: googleClientId,
         clientSecret: googleClientSecret,
         callbackURL: `${backendUrl}/api/auth/google/callback`,
+        proxy: true,
       },
       async (_accessToken, _refreshToken, profile, done) => {
         try {
