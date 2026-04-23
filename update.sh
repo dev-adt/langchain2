@@ -4,7 +4,9 @@ echo "🚀 Starting Update Process..."
 
 # 1. Pull code from Git
 echo "📥 Pulling latest code from Git..."
-git pull origin main
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+echo "📍 Current branch: $CURRENT_BRANCH"
+git pull origin $CURRENT_BRANCH
 
 # 2. Update Backend
 echo "⚙️ Updating Backend..."
