@@ -79,7 +79,9 @@ export interface CreateChatbotPayload {
   starterPrompts?: { title: string; description: string; prompt: string }[];
   model: string;
   isPublic?: boolean;
+  avatar?: string | null;
 }
+
 
 // ============ SSE Types ============
 export interface SSEEvent {
