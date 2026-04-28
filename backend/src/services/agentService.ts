@@ -1,7 +1,7 @@
 import { ChatOpenAI } from '@langchain/openai';
 import { Tool } from '@langchain/core/tools';
 import { DynamicTool } from '@langchain/core/tools';
-import { TavilySearch } from '@langchain/tavily';
+import { TavilySearchResults } from '@langchain/community/tools/tavily_search';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { MemorySaver } from '@langchain/langgraph';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
@@ -55,12 +55,13 @@ export const streamAgentChat = async (options: AgentChatOptions): Promise<void> 
 
     // Tool: Web Search (Tavily)
     if (config.tavilyApiKey) {
-      const webSearchTool = new TavilySearch({
+      const webSearchTool = new TavilySearchResults({
         apiKey: config.tavilyApiKey,
         maxResults: 3,
       });
       tools.push(webSearchTool);
     }
+
 
     // Tool: Calculator
     const calculatorTool = new DynamicTool({

@@ -6,9 +6,10 @@ import prisma from '../config/database';
  */
 export const getPublicChatbot = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const chatbot = await prisma.chatbot.findUnique({
       where: { id },
+
       select: {
         id: true,
         name: true,
