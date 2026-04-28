@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
 import { config } from './config';
@@ -8,6 +10,18 @@ import passport from 'passport';
 import { configurePassport } from './config/passport';
 
 dotenv.config();
+
+// Ensure upload directories exist
+const uploadDir = path.join(__dirname, '../uploads');
+const avatarDir = path.join(__dirname, '../uploads/avatars');
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+if (!fs.existsSync(avatarDir)) {
+  fs.mkdirSync(avatarDir, { recursive: true });
+}
+
 
 // Initialize passport
 configurePassport();
