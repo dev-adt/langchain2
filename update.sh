@@ -33,8 +33,9 @@ npm install
 npm run build
 
 # Đổi tên tiến trình để ép PM2 chạy luồng mới hoàn toàn
-pm2 delete ai-frontend 2>/dev/null || true
+pm2 delete ai-frontend-v3 2>/dev/null || true
 pm2 start npm --name "ai-frontend-v3" -- start -- -p 3002
+
 cd ..
 
 echo "✅ DEEP CLEAN Update Completed Successfully!"
