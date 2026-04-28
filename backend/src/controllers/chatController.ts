@@ -1,6 +1,11 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database';
 import { streamChat } from '../services/langchainService';
+import { streamAgentChat } from '../services/agentService';
+
+// Get all conversations for current user
+// ... (rest of imports)
+
 
 // Get all conversations for current user
 export const getConversations = async (req: Request, res: Response): Promise<void> => {
@@ -49,8 +54,9 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
           orderBy: { createdAt: 'asc' },
         },
         chatbot: {
-          select: { id: true, name: true, systemPrompt: true, model: true },
+          select: { id: true, name: true, avatar: true, systemPrompt: true, model: true },
         },
+
       },
     });
 
@@ -69,11 +75,6 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
 // Send a message and get AI response (SSE streaming)
 export const sendMessage = async (req: Request, res: Response): Promise<void> => {
   try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Not authenticated' });
-      return;
-    }
-
     const { message, conversationId, chatbotId } = req.body;
 
     if (!message) {
@@ -86,7 +87,7 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
     if (conversationId) {
       // Existing conversation
       conversation = await prisma.conversation.findFirst({
-        where: { id: conversationId, userId: req.user.id },
+        where: { id: conversationId },
         include: {
           messages: { orderBy: { createdAt: 'asc' } },
           chatbot: true,
@@ -97,22 +98,39 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
         res.status(404).json({ error: 'Conversation not found' });
         return;
       }
+
+      // Security check: If conversation has a userId, ensure it matches current user
+      if (conversation.userId && (!req.user || conversation.userId !== req.user.id)) {
+        res.status(401).json({ error: 'Not authorized to access this conversation' });
+        return;
+      }
+
+      // If conversation has no userId, ensure chatbot is public
+      if (!conversation.userId && (!conversation.chatbot?.isPublic)) {
+        res.status(401).json({ error: 'Not authorized' });
+        return;
+      }
     } else {
       // Create new conversation
-      // Security check: If chatbotId is provided, ensure it's either owned by user or public
-      if (chatbotId) {
+      if (!chatbotId) {
+        if (!req.user) {
+          res.status(401).json({ error: 'Not authenticated' });
+          return;
+        }
+      } else {
         const targetChatbot = await prisma.chatbot.findFirst({
-          where: {
-            id: chatbotId,
-            OR: [
-              { userId: req.user.id },
-              { isPublic: true }
-            ]
-          }
+          where: { id: chatbotId }
         });
 
         if (!targetChatbot) {
-          res.status(404).json({ error: 'Chatbot not found or not accessible' });
+          res.status(404).json({ error: 'Chatbot not found' });
+          return;
+        }
+
+        // Check access: owner OR public
+        const isOwner = req.user && targetChatbot.userId === req.user.id;
+        if (!isOwner && !targetChatbot.isPublic) {
+          res.status(403).json({ error: 'Access denied to this chatbot' });
           return;
         }
       }
@@ -120,7 +138,7 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
       const title = message.substring(0, 100);
       conversation = await prisma.conversation.create({
         data: {
-          userId: req.user.id,
+          userId: req.user?.id || null, // Allow null for public/embedded chats
           chatbotId: chatbotId || null,
           title,
         },
@@ -166,8 +184,8 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
 
     let fullResponse = '';
 
-    // Stream AI response
-    await streamChat({
+    // Stream AI response using Agent Service (with Tools support)
+    await streamAgentChat({
       messages: history,
       systemPrompt,
       model,

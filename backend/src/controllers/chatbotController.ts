@@ -110,7 +110,7 @@ export const updateChatbot = async (req: Request, res: Response): Promise<void> 
     }
 
     const id = req.params.id as string;
-    const { name, description, systemPrompt, starterPrompts, model, isPublic } = req.body;
+    const { name, description, systemPrompt, starterPrompts, model, isPublic, avatar } = req.body;
 
     const chatbot = await prisma.chatbot.findFirst({
       where: { id, userId: req.user.id },
@@ -130,6 +130,7 @@ export const updateChatbot = async (req: Request, res: Response): Promise<void> 
         starterPrompts: starterPrompts !== undefined ? JSON.stringify(starterPrompts) : chatbot.starterPrompts,
         model: model || chatbot.model,
         isPublic: isPublic !== undefined ? isPublic : chatbot.isPublic,
+        avatar: avatar !== undefined ? avatar : chatbot.avatar,
       },
     });
 
@@ -164,5 +165,44 @@ export const deleteChatbot = async (req: Request, res: Response): Promise<void> 
   } catch (error) {
     console.error('Delete chatbot error:', error);
     res.status(500).json({ error: 'Failed to delete chatbot' });
+  }
+};
+// Upload chatbot avatar
+export const uploadAvatar = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Not authenticated' });
+      return;
+    }
+
+    const id = req.params.id as string;
+    const file = req.file;
+
+    if (!file) {
+      res.status(400).json({ error: 'No file uploaded' });
+      return;
+    }
+
+    const chatbot = await prisma.chatbot.findFirst({
+      where: { id, userId: req.user.id },
+    });
+
+    if (!chatbot) {
+      res.status(404).json({ error: 'Chatbot not found' });
+      return;
+    }
+
+    // Save avatar path (relative to static root)
+    const avatarPath = `/uploads/avatars/${file.filename}`;
+
+    const updated = await prisma.chatbot.update({
+      where: { id },
+      data: { avatar: avatarPath },
+    });
+
+    res.json({ avatar: avatarPath, chatbot: updated });
+  } catch (error) {
+    console.error('Upload avatar error:', error);
+    res.status(500).json({ error: 'Failed to upload avatar' });
   }
 };

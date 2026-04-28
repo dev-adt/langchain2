@@ -5,14 +5,19 @@ import {
   createChatbot,
   updateChatbot,
   deleteChatbot,
+  uploadAvatar,
 } from '../controllers/chatbotController';
 import { uploadFile, getDatasetStatus, deleteDataset } from '../controllers/fileController';
+import { getPublicChatbot } from '../controllers/publicController';
 import { authMiddleware } from '../middlewares/authMiddleware';
-import { upload } from '../middlewares/upload';
+import { upload, avatarUpload } from '../middlewares/upload';
 
 const router = Router();
 
-// All chatbot routes require authentication
+// Public routes (no auth required)
+router.get('/public/:id', getPublicChatbot);
+
+// All other chatbot routes require authentication
 router.use(authMiddleware);
 
 // Chatbot CRUD
@@ -22,8 +27,12 @@ router.post('/', createChatbot);
 router.put('/:id', updateChatbot);
 router.delete('/:id', deleteChatbot);
 
+// Avatar upload
+router.post('/:id/avatar', avatarUpload.single('avatar'), uploadAvatar);
+
 // Dataset management
 router.post('/:chatbotId/upload', upload.single('file'), uploadFile);
+
 router.get('/dataset/:datasetId/status', getDatasetStatus);
 router.delete('/dataset/:datasetId', deleteDataset);
 

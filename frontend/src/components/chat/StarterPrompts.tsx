@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { useChatStore } from '@/store/chatStore';
+import { API_BASE_URL } from '@/services/api';
 
 interface StarterPrompt {
   title: string;
@@ -23,7 +24,11 @@ const DEFAULT_STARTER_PROMPTS: StarterPrompt[] = [
 ];
 
 export default function StarterPrompts() {
-  const { sendMessage, activeChatbotId, activeChatbotName, conversations } = useChatStore();
+  const { sendMessage, activeChatbotId, activeChatbotName, activeChatbotAvatar } = useChatStore();
+  
+  const baseUrl = API_BASE_URL.replace('/api', '');
+  const avatarUrl = activeChatbotAvatar ? `${baseUrl}${activeChatbotAvatar}` : null;
+
 
   // Try to find the active chatbot details to get its starter prompts
   // Note: In a real app, we might want to fetch the full chatbot details or store them in a store
@@ -51,10 +56,15 @@ export default function StarterPrompts() {
   return (
     <div className="flex flex-col items-center justify-center flex-1 px-4 py-8 max-w-3xl mx-auto w-full">
       {/* AI Logo */}
-      <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg mb-6 ${activeChatbotId ? 'bg-gradient-to-br from-indigo-400 to-purple-500' : 'bg-gradient-to-br from-teal-400 to-teal-600'
+      <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg mb-6 overflow-hidden border-2 border-white ${activeChatbotId ? 'bg-gradient-to-br from-indigo-400 to-purple-500' : 'bg-gradient-to-br from-teal-400 to-teal-600'
         }`}>
-        {activeChatbotName ? activeChatbotName.substring(0, 2).toUpperCase() : 'AI'}
+        {avatarUrl ? (
+          <img src={avatarUrl} alt={activeChatbotName || 'Bot'} className="w-full h-full object-cover" />
+        ) : (
+          activeChatbotName ? activeChatbotName.substring(0, 2).toUpperCase() : 'AI'
+        )}
       </div>
+
 
       {/* Welcome Text */}
       <h1 className="text-2xl md:text-3xl font-bold text-gray-800 text-center mb-2 leading-tight">

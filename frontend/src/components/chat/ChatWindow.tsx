@@ -3,9 +3,15 @@
 import React, { useEffect, useRef } from 'react';
 import { useChatStore } from '@/store/chatStore';
 import MessageBubble from './MessageBubble';
+import Avatar from '@/components/ui/Avatar';
+import { API_BASE_URL } from '@/services/api';
 
 export default function ChatWindow() {
-  const { messages, isStreaming, streamingContent } = useChatStore();
+  const { messages, isStreaming, streamingContent, activeChatbotName, activeChatbotAvatar } = useChatStore();
+  
+  const baseUrl = API_BASE_URL.replace('/api', '');
+  const avatarUrl = activeChatbotAvatar ? `${baseUrl}${activeChatbotAvatar}` : null;
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom on new messages
@@ -30,7 +36,10 @@ export default function ChatWindow() {
             key={message.id}
             role={message.role as 'user' | 'assistant'}
             content={message.content}
+            botAvatar={avatarUrl}
+            botName={activeChatbotName}
           />
+
         ))}
 
         {/* Streaming message */}
@@ -39,15 +48,19 @@ export default function ChatWindow() {
             role="assistant"
             content={streamingContent}
             isStreaming={true}
+            botAvatar={avatarUrl}
+            botName={activeChatbotName}
           />
+
         )}
 
         {/* Loading indicator */}
         {isStreaming && !streamingContent && (
           <div className="flex gap-3 py-4 px-4 md:px-0 justify-start">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-1">
-              AI
+            <div className="flex-shrink-0 mt-1">
+              <Avatar isAI name={activeChatbotName || 'AI'} src={avatarUrl} size="sm" />
             </div>
+
             <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-3">
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />

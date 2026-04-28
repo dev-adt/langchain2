@@ -13,21 +13,26 @@
     "prisma:studio": "prisma studio"
   },
   "dependencies": {
-    "@langchain/community": "^0.3.0",
-    "@langchain/core": "^0.3.0",
-    "@langchain/openai": "^0.3.0",
+    "@langchain/community": "^0.3.30",
+    "@langchain/core": "^0.3.39",
+    "@langchain/langgraph": "^0.2.45",
+    "@langchain/openai": "^0.3.17",
+    "@langchain/tavily": "^0.1.0",
     "@prisma/client": "^6.0.0",
     "bcryptjs": "^2.4.3",
+    "cohere-ai": "^8.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.0",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
-    "langchain": "^0.3.0",
+    "langchain": "^0.3.17",
+    "mammoth": "^1.12.0",
     "multer": "^1.4.5-lts.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "pdf-parse": "^1.1.1",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

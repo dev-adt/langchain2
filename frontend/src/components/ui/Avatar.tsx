@@ -27,6 +27,15 @@ export default function Avatar({ name, src, size = 'md', isAI = false }: AvatarP
     : 'AI';
 
   if (isAI) {
+    if (src) {
+      return (
+        <img
+          src={src}
+          alt={name || 'AI Avatar'}
+          className={`${sizes[size]} rounded-full object-cover flex-shrink-0 shadow-sm border border-teal-50`}
+        />
+      );
+    }
     return (
       <div
         className={`${sizes[size]} rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white font-bold shadow-md flex-shrink-0`}
@@ -35,6 +44,7 @@ export default function Avatar({ name, src, size = 'md', isAI = false }: AvatarP
       </div>
     );
   }
+
 
   if (src) {
     return (

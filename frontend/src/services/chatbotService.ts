@@ -12,6 +12,11 @@ export const chatbotService = {
     return data.chatbot;
   },
 
+  getPublicChatbot: async (id: string): Promise<Chatbot> => {
+    const { data } = await api.get(`/chatbots/public/${id}`);
+    return data.chatbot;
+  },
+
   createChatbot: async (payload: CreateChatbotPayload): Promise<Chatbot> => {
     const { data } = await api.post('/chatbots', payload);
     return data.chatbot;
@@ -21,6 +26,16 @@ export const chatbotService = {
     const { data } = await api.put(`/chatbots/${id}`, payload);
     return data.chatbot;
   },
+
+  uploadAvatar: async (id: string, file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    const { data } = await api.post(`/chatbots/${id}/avatar`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data.avatar;
+  },
+
 
   deleteChatbot: async (id: string): Promise<void> => {
     await api.delete(`/chatbots/${id}`);

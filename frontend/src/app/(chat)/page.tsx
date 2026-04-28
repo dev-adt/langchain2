@@ -27,7 +27,8 @@ function HomeContent() {
               console.error('Failed to parse starter prompts', e);
             }
           }
-          setActiveChatbot(chatbot.id, chatbot.name, prompts);
+          setActiveChatbot(chatbot.id, chatbot.name, prompts, chatbot.avatar);
+
         } catch (error) {
           console.error('Failed to load bot from URL:', error);
           // If failed, revert to default

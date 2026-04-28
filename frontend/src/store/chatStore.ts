@@ -7,6 +7,7 @@ interface ChatState {
   activeConversationId: string | null;
   activeChatbotId: string | null;
   activeChatbotName: string | null;
+  activeChatbotAvatar: string | null;
   activeChatbotPrompts: { title: string; description: string; prompt: string }[] | null;
   messages: Message[];
   isLoadingConversations: boolean;
@@ -21,12 +22,14 @@ interface ChatState {
   setActiveChatbot: (
     id: string | null,
     name: string | null,
-    prompts?: { title: string; description: string; prompt: string }[] | null
+    prompts?: { title: string; description: string; prompt: string }[] | null,
+    avatar?: string | null
   ) => void;
   switchChatbot: (
     id: string | null,
     name: string | null,
-    prompts?: { title: string; description: string; prompt: string }[] | null
+    prompts?: { title: string; description: string; prompt: string }[] | null,
+    avatar?: string | null
   ) => void;
   sendMessage: (
     message: string,
@@ -44,6 +47,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   activeConversationId: null,
   activeChatbotId: null,
   activeChatbotName: null,
+  activeChatbotAvatar: null,
   activeChatbotPrompts: null,
   messages: [],
   isLoadingConversations: false,
@@ -69,6 +73,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const conversation = await chatService.getConversation(conversationId);
       set({
         messages: conversation.messages || [],
+        activeChatbotName: conversation.chatbot?.name || 'AI Assistant',
+        activeChatbotAvatar: conversation.chatbot?.avatar || null,
         isLoadingMessages: false,
       });
     } catch (error: any) {
@@ -95,11 +101,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
   setActiveChatbot: (
     id: string | null,
     name: string | null,
-    prompts?: { title: string; description: string; prompt: string }[] | null
+    prompts?: { title: string; description: string; prompt: string }[] | null,
+    avatar?: string | null
   ) => {
     set({
       activeChatbotId: id,
       activeChatbotName: name,
+      activeChatbotAvatar: avatar || null,
       activeChatbotPrompts: prompts || null,
     });
   },
@@ -107,7 +115,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
   switchChatbot: (
     id: string | null,
     name: string | null,
-    prompts?: { title: string; description: string; prompt: string }[] | null
+    prompts?: { title: string; description: string; prompt: string }[] | null,
+    avatar?: string | null
   ) => {
     set({
       activeConversationId: null,
@@ -116,6 +125,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       streamingContent: '',
       activeChatbotId: id,
       activeChatbotName: name,
+      activeChatbotAvatar: avatar || null,
       activeChatbotPrompts: prompts || null,
     });
   },

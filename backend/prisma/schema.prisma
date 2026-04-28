@@ -71,12 +71,12 @@ model DocumentChunk {
 
 model Conversation {
   id        String    @id @default(uuid())
-  userId    String    @map("user_id")
+  userId    String?   @map("user_id")
   chatbotId String?   @map("chatbot_id")
   title     String    @default("New Conversation")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   chatbot   Chatbot?  @relation(fields: [chatbotId], references: [id], onDelete: SetNull)
   messages  Message[]
 

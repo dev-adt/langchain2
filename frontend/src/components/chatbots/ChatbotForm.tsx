@@ -4,7 +4,9 @@ import React, { useState } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { CreateChatbotPayload } from '@/types';
-import { Plus, Trash2, HelpCircle, Maximize2, X } from 'lucide-react';
+import { Plus, Trash2, HelpCircle, Maximize2, X, Upload, Bot as BotIcon } from 'lucide-react';
+import { chatbotService } from '@/services/chatbotService';
+import { API_BASE_URL } from '@/services/api';
 
 interface ChatbotFormProps {
   initialData?: Partial<CreateChatbotPayload>;
@@ -41,6 +43,9 @@ export default function ChatbotForm({
     ]
   );
   const [isPublic, setIsPublic] = useState(initialData?.isPublic || false);
+  const [avatar, setAvatar] = useState<string | null>(initialData?.avatar || null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
 
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
@@ -54,11 +59,29 @@ export default function ChatbotForm({
       setSystemPrompt(initialData.systemPrompt || 'You are a helpful assistant. Respond in Vietnamese.');
       setModel(initialData.model || 'gpt-3.5-turbo');
       setIsPublic(initialData.isPublic || false);
+      setAvatar(initialData.avatar || null);
       if (initialData.starterPrompts) {
         setStarterPrompts(initialData.starterPrompts);
       }
     }
   }, [initialData]);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !initialData?.id) return;
+
+    setIsUploadingAvatar(true);
+    try {
+      const avatarUrl = await chatbotService.uploadAvatar(initialData.id, file);
+      setAvatar(avatarUrl);
+    } catch (err) {
+      console.error('Failed to upload avatar:', err);
+      setError('Không thể tải lên ảnh đại diện');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
 
   const handleAddPrompt = () => {
     if (starterPrompts.length < 4) {
@@ -118,6 +141,39 @@ export default function ChatbotForm({
           {error}
         </div>
       )}
+
+      {/* Avatar Upload */}
+      {initialData?.id && (
+        <div className="flex items-center gap-6 p-4 rounded-2xl bg-gray-50 border border-gray-100">
+          <div className="relative group">
+            <div className="w-20 h-20 rounded-2xl bg-white border-2 border-gray-100 flex items-center justify-center overflow-hidden shadow-sm">
+              {avatar ? (
+                <img 
+                  src={`${API_BASE_URL.replace('/api', '')}${avatar}`} 
+                  alt="Avatar" 
+                  className="w-full h-full object-cover" 
+                />
+              ) : (
+                <BotIcon className="w-10 h-10 text-gray-300" />
+              )}
+              {isUploadingAvatar && (
+                <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+            </div>
+            <label className="absolute -bottom-2 -right-2 p-1.5 bg-teal-600 text-white rounded-lg shadow-lg cursor-pointer hover:bg-teal-700 transition-colors">
+              <Upload className="w-3.5 h-3.5" />
+              <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} disabled={isUploadingAvatar} />
+            </label>
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-gray-800">Logo Chatbot</h4>
+            <p className="text-xs text-gray-500 mt-1">Tải lên ảnh PNG hoặc JPG (tối đa 2MB)</p>
+          </div>
+        </div>
+      )}
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input

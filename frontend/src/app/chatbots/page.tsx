@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { chatbotService } from '@/services/chatbotService';
 import { Chatbot } from '@/types';
+import { API_BASE_URL } from '@/services/api';
 import Button from '@/components/ui/Button';
 import {
   Plus,
@@ -20,6 +21,8 @@ export default function ChatbotsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated, loadFromStorage } = useAuthStore();
   const router = useRouter();
+  const baseUrl = API_BASE_URL.replace('/api', '');
+
 
   useEffect(() => {
     loadFromStorage();
@@ -114,9 +117,14 @@ export default function ChatbotsPage() {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white">
-                      <Bot className="w-5 h-5" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white overflow-hidden">
+                      {bot.avatar ? (
+                        <img src={`${baseUrl}${bot.avatar}`} alt={bot.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <Bot className="w-5 h-5" />
+                      )}
                     </div>
+
                     <div>
                       <h3 className="font-semibold text-gray-800">
                         {bot.name}

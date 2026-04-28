@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database';
 import { processDocument } from '../services/documentService';
+import { invalidateVectorCache } from '../services/vectorStoreService';
+
 
 // Upload file for a chatbot's dataset
 export const uploadFile = async (req: Request, res: Response): Promise<void> => {
@@ -42,6 +44,9 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
     // Process document asynchronously (parse, chunk, embed)
     processDocument(dataset.id, file.path, chatbotId)
       .then(async () => {
+        // Invalidate vector cache when processing is done
+        invalidateVectorCache(chatbotId);
+        
         await prisma.dataset.update({
           where: { id: dataset.id },
           data: { vectorStatus: 'completed' },
@@ -143,6 +148,10 @@ export const deleteDataset = async (req: Request, res: Response): Promise<void> 
     }
 
     await prisma.dataset.delete({ where: { id: datasetId } });
+    
+    // Invalidate vector cache when dataset is deleted
+    invalidateVectorCache(dataset.chatbotId);
+    
     res.json({ message: 'Dataset deleted' });
   } catch (error) {
     console.error('Delete dataset error:', error);

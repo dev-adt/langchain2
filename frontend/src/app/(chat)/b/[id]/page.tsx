@@ -45,7 +45,8 @@ export default function SharedChatbotPage() {
           }
         }
 
-        setActiveChatbot(chatbot.id, chatbot.name, prompts);
+        setActiveChatbot(chatbot.id, chatbot.name, prompts, chatbot.avatar);
+
         setIsLoading(false);
       } catch (err: any) {
         console.error('Failed to load shared chatbot:', err);

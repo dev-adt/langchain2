@@ -19,6 +19,8 @@ import { useChatStore } from '@/store/chatStore';
 import { chatbotService } from '@/services/chatbotService';
 import { Chatbot } from '@/types';
 import ConversationList from './ConversationList';
+import { API_BASE_URL } from '@/services/api';
+
 
 export default function Sidebar() {
   const { isOpen, toggle, close } = useSidebarStore();
@@ -140,9 +142,18 @@ export default function Sidebar() {
                         }`}
                       id={`bot-${bot.id}`}
                     >
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white flex-shrink-0">
-                        <Bot className="w-3.5 h-3.5" />
+                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white flex-shrink-0 overflow-hidden">
+                        {bot.avatar ? (
+                          <img 
+                            src={`${API_BASE_URL.replace('/api', '')}${bot.avatar}`} 
+                            alt={bot.name} 
+                            className="w-full h-full object-cover" 
+                          />
+                        ) : (
+                          <Bot className="w-3.5 h-3.5" />
+                        )}
                       </div>
+
                       <span className="truncate flex-1">{bot.name}</span>
                       {activeChatbotId === bot.id && (
                         <Sparkles className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" />

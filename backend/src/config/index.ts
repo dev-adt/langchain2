@@ -12,4 +12,6 @@ export const config = {
   backendUrl: process.env.BACKEND_URL || 'http://localhost:3001',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
   databaseUrl: process.env.DATABASE_URL || 'file:./dev.db',
+  cohereApiKey: process.env.COHERE_API_KEY || '',
+  tavilyApiKey: process.env.TAVILY_API_KEY || '',
 };

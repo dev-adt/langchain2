@@ -10,10 +10,13 @@ interface MessageBubbleProps {
   role: 'user' | 'assistant';
   content: string;
   isStreaming?: boolean;
+  botAvatar?: string | null;
+  botName?: string | null;
 }
 
-export default function MessageBubble({ role, content, isStreaming }: MessageBubbleProps) {
+export default function MessageBubble({ role, content, isStreaming, botAvatar, botName }: MessageBubbleProps) {
   const { user } = useAuthStore();
+
   const isUser = role === 'user';
 
   return (
@@ -21,9 +24,10 @@ export default function MessageBubble({ role, content, isStreaming }: MessageBub
       {/* AI Avatar */}
       {!isUser && (
         <div className="flex-shrink-0 mt-1">
-          <Avatar isAI size="sm" />
+          <Avatar isAI name={botName || 'AI'} src={botAvatar} size="sm" />
         </div>
       )}
+
 
       {/* Message Content */}
       <div
